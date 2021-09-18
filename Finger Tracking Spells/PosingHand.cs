@@ -37,14 +37,14 @@ namespace Finger_Tracking_Spells
             {
                 if (pose[i] == 1f)
                 {
-                    if (this.hand[i] < 0.85f)
+                    if (this.hand[i] < 0.8f)
                     {
                         return false;
                     }
                 }
                 if (pose[i] == 0f)
                 {
-                    if (this.hand[i] > 0.85f)
+                    if (this.hand[i] > 0.8f)
                     {
                         return false;
                     }
