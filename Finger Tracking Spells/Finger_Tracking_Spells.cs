@@ -28,7 +28,7 @@ namespace Finger_Tracking_Spells
         {
             if (creature.isPlayer)
             {
-                Debug.Log("Mod loaded");
+                Debug.Log("Finger Tracking Spells loaded");
                 try
                 {
                     foreach (string i in spellIdAtPose)
@@ -61,7 +61,7 @@ namespace Finger_Tracking_Spells
             {
                 Creature creature = Player.currentCreature;
                 {
-                    if (Time.time - timeOfSwap >= 1f && orb != null)
+                    if (Time.time - timeOfSwap >= cooldownTime && orb != null)
                     {
                         DespawnOrb(orb);
                         orb = null;
