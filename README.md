@@ -1,4 +1,6 @@
 # B-S-Finger-Tracking-Spells
+B&S Spell Selection with Finger Tracking
+
 With this mod I intend to make use of Blade and Sorcery's finger tracking.
 (That being said, this works best with the Index)
 
