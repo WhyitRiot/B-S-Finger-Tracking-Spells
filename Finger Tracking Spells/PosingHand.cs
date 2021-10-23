@@ -14,7 +14,7 @@ namespace Finger_Tracking_Spells
         public SpellCastData currentSpell;
         public bool isCasting = false;
         public bool intermediateTriggered = false;
-
+        public bool intermFirstPose = false;
         public PosingHand(Side side)
         {
             this.side = side;

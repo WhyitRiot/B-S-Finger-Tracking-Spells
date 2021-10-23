@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using ThunderRoad;
-using System.Collections.Generic;
 
 namespace Finger_Tracking_Spells
 {
@@ -72,8 +72,16 @@ namespace Finger_Tracking_Spells
                     }
                     if (hand.CheckForPose(intermediaryPose))
                     {
-                        intermTime = Time.time;
-                        hand.intermediateTriggered = true;
+                        if (!hand.intermFirstPose)
+                        {
+                            intermTime = Time.time;
+                            hand.intermediateTriggered = true;
+                            hand.intermFirstPose = true;
+                        }
+                    }
+                    if (Time.time - hand.timeOfSwap >= cooldownBetweenSwapTime && !hand.CheckForPose(intermediaryPose))
+                    {
+                        hand.intermFirstPose = false;
                     }
                     if (hand.intermediateTriggered)
                     {
