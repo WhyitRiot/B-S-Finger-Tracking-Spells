@@ -10,11 +10,15 @@ namespace Finger_Tracking_Spells
     {
         public float[][] handPoses;
         public string[] spellIdAtPose;
+        public bool waitForIntermediate;
+        public float[] intermediaryPose;
         public float cooldownBetweenSwapTime;
         public float cooldownBetweenCastTime;
+        public float cooldownIntermidiary;
+        public bool castOnPose;
+        private float intermTime = Time.time;
         PosingHand[] hands = new PosingHand[] { new PosingHand(Side.Left), new PosingHand(Side.Right) };
         List<WheelMenu.Orb> list;
-        WheelMenu icons;
 
         public override IEnumerator OnLoadCoroutine(Level level)
         {
@@ -27,21 +31,15 @@ namespace Finger_Tracking_Spells
             if (creature.isPlayer)
             {
                 Debug.Log("Finger Tracking Spells loaded");
+                Debug.Log("CastOnPose: " + castOnPose);
+                Debug.Log("WaitForIntermediary: " + waitForIntermediate);
                 try
                 {
                     foreach (string i in spellIdAtPose)
                     {
                         Debug.Log(i);
                     }
-                    foreach (float[] i in handPoses)
-                    {
-                        string debugShit = "";
-                        foreach (float j in i)
-                        {
-                            debugShit += " " + i.ToString();
-                        }
-                        Debug.Log(debugShit);
-                    }
+                    Debug.Log("Hand Poses loaded: " + handPoses.Length);
                     Debug.Log(cooldownBetweenSwapTime);
                     Debug.Log(cooldownBetweenCastTime);
                 }
@@ -63,22 +61,71 @@ namespace Finger_Tracking_Spells
                 {
                     hand.DespawnOrb(hand.orb);
                 }
-                for (int i = 0; i < handPoses.Length; i++)
+                if (waitForIntermediate)
                 {
-                    if (hand.CheckForPose(handPoses[i]))
+                    if (Time.time - intermTime >= cooldownIntermidiary)
                     {
-                        if (!creature.mana.GetCaster(hand.side).isFiring && Time.time - hand.timeOfCast >= cooldownBetweenCastTime)
+                        if (!creature.mana.GetCaster(hand.side).isFiring)
                         {
-                            if (creature.GetHand(hand.side).grabbedHandle == null && Time.time - hand.timeOfSwap >= cooldownBetweenSwapTime)
-                            {
-                                LoadSpell(hand, creature.mana.GetCaster(hand.side), hand.side, GetSpell(spellIdAtPose[i]));
-                                hand.timeOfSwap = Time.time;
-                            }
+                            hand.intermediateTriggered = false;
                         }
-                        else
+                    }
+                    if (hand.CheckForPose(intermediaryPose))
+                    {
+                        intermTime = Time.time;
+                        hand.intermediateTriggered = true;
+                    }
+                    if (hand.intermediateTriggered)
+                    {
+                        PoseCast(hand, creature);
+                    }
+                }
+                else
+                {
+                    PoseCast(hand, creature);
+                }
+            }
+        }
+
+        void PoseCast(PosingHand hand, Creature creature)
+        {
+            for (int i = 0; i < handPoses.Length; i++)
+            {
+                if (hand.CheckForPose(handPoses[i]))
+                {
+                    if (!creature.mana.GetCaster(hand.side).isFiring && Time.time - hand.timeOfCast >= cooldownBetweenCastTime)
+                    {
+                        if (creature.GetHand(hand.side).grabbedHandle == null && Time.time - hand.timeOfSwap >= cooldownBetweenSwapTime)
+                        {
+                            LoadSpell(hand, creature.mana.GetCaster(hand.side), hand.side, GetSpell(spellIdAtPose[i]));
+                            hand.timeOfSwap = Time.time;
+                        }
+                        if (castOnPose && !creature.mana.GetCaster(hand.side).isFiring)
+                        {
+                            hand.isCasting = true;
+                            PlayerControl.GetHand(hand.side).gripPressed = false;
+                            creature.mana.GetCaster(hand.side).Fire(true);
+                            creature.mana.GetCaster(hand.side).FireAxis(1f);
+                        }
+                    }
+                    else
+                    {
+                        if (!creature.mana.GetCaster(hand.side).isFiring)
                         {
                             hand.timeOfCast = Time.time;
+                            hand.intermediateTriggered = false;
                         }
+                    }
+                }
+                else if (castOnPose && creature.mana.GetCaster(hand.side).isFiring)
+                {
+                    if (hand.currentSpell.hashId == GetSpell(spellIdAtPose[i]).hashId)
+                    {
+                        Debug.Log("Should stop casting");
+                        creature.mana.GetCaster(hand.side).Fire(false);
+                        creature.mana.GetCaster(hand.side).FireAxis(0f);
+                        hand.isCasting = false;
+                        hand.intermediateTriggered = false;
                     }
                 }
             }
@@ -93,10 +140,10 @@ namespace Finger_Tracking_Spells
                     return;
                 }
                 caster.LoadSpell((SpellCastData)spell);
+                hand.currentSpell = (SpellCastData)spell;
                 this.list = PopulateSpellMenu();
                 hand.SpawnOrb(GetSpellOrb(list, GetSpellIconEffect(spell.id)), Player.currentCreature.GetHand(side));
                 PlayerControl.GetHand(side).HapticShort(1f);
-                Debug.Log(spell.ToString());
             }
             else
             {
@@ -149,8 +196,7 @@ namespace Finger_Tracking_Spells
                 ItemModuleSpell module = content.itemData.GetModule<ItemModuleSpell>();
                 if (module != null && module.spellData is SpellCastData && content.itemData.categoryPath.Length == 0)
                 {
-                    list.Add(new WheelMenu.Orb(content.itemData.iconEffectData, content, icons));
-                    Debug.Log(content.itemData.iconEffectData);
+                    list.Add(new WheelMenu.Orb(content.itemData.iconEffectData, content, null));
                 }
             }
             return list;

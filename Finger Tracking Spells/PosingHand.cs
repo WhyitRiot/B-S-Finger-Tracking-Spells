@@ -11,6 +11,9 @@ namespace Finger_Tracking_Spells
         public WheelMenu.Orb orb;
         public float timeOfSwap = Time.time;
         public float timeOfCast = Time.time;
+        public SpellCastData currentSpell;
+        public bool isCasting = false;
+        public bool intermediateTriggered = false;
 
         public PosingHand(Side side)
         {
