@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using System.Reflection;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace GestureCasting
 {
     public class GestureCastController : MonoBehaviour
     {
+        private string fileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Settings.json");
         public GestureCastData data = new GestureCastData();
-        public delegate void ControllerCreatedEventHandler(object source, EventArgs e);
-        public event ControllerCreatedEventHandler ControllerCreated;
-        public void Start()
+        public void Serialize(GestureCastData data)
         {
-            OnControllerCreated();
+            string jsonString = JsonConvert.SerializeObject(data, Formatting.Indented);
+            File.WriteAllText(fileName, jsonString);
         }
-        protected virtual void OnControllerCreated()
+        public void Deserialize()
         {
-            if (ControllerCreated != null)
-            {
-                ControllerCreated(this, EventArgs.Empty);
-            }
+            string settingsFile = File.ReadAllText(fileName);
+            GestureCastData settings = JsonConvert.DeserializeObject<GestureCastData>(settingsFile);
+            this.data = settings;
         }
     }
 }

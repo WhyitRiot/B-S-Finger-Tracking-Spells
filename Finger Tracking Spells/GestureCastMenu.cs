@@ -38,15 +38,9 @@ namespace GestureCasting
             WaitForIntermediaryToggle.onValueChanged.AddListener(delegate { ToggleWaitForIterm(); });
             //Data link
             controller = GameManager.local.gameObject.AddComponent<GestureCastController>();
-            controller.data.menuLoaded = true;
-            WaitForUpdate();
-        }
-        private IEnumerator WaitForUpdate()
-        {
-            while (!controller.data.levelLoaded)
-            {
-                yield return null;
-            }
+            controller.Deserialize();
+            UpdateMenuData();
+            Debug.Log("GestureCastMenu loaded");
         }
 
         public void UpdateMenuData()

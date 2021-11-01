@@ -26,6 +26,7 @@ namespace GestureCasting
         public override IEnumerator OnLoadCoroutine()
         {
             EventManager.onCreatureSpawn += EventManager_onCreatureSpawn;
+            //EventManager.onLevelLoad += OnLevelLoaded;
             yield break;
         }
 
@@ -52,6 +53,10 @@ namespace GestureCasting
                     Debug.Log(e);
                 }
                 this.creature = Player.currentCreature;
+                this.controller = GameManager.local.gameObject.GetComponent<GestureCastController>();
+                this.handPoses = controller.data.handPoses;
+                this.intermediaryPose = controller.data.intermediaryPose;
+                this.spellIdAtPose = controller.data.spellIdAtPose;
                 loaded = true;
             }
         }
@@ -60,16 +65,7 @@ namespace GestureCasting
         {
             if (loaded)
             {
-                if (controller != null)
-                {
-                    this.controller = GameManager.local.gameObject.GetComponent<GestureCastController>();
-                    OnMenuLoaded(controller);
-                }
-                else if (controller.data.menuLoaded)
-                {
-                    UpdateData();
-                }
-
+                UpdateData();
                 foreach (PosingHand hand in hands)
                 {
                     hand.UpdateFingers();
@@ -112,15 +108,25 @@ namespace GestureCasting
             }
         }
 
-        public void OnMenuLoaded(GestureCastController controller)
+        public void OnLevelLoaded(LevelData leveldata, EventTime eventTime)
         {
-            this.controller = controller;
-            this.controller.data.castOnPose = this.castOnPose;
-            this.controller.data.waitForIntermediate = this.waitForIntermediate;
-            this.controller.data.cooldownBetweenSwapTime = this.cooldownBetweenSwapTime;
-            this.controller.data.cooldownBetweenCastTime = this.cooldownBetweenCastTime;
-            this.controller.data.cooldownIntermediary = this.cooldownIntermidiary;
-            this.controller.data.levelLoaded = true;
+            if (this.controller != null)
+            {
+                this.controller.Serialize(this.controller.data);
+            }
+        }
+
+        public void DebugSerialize()
+        {
+            this.controller.data.handPoses = handPoses;
+            this.controller.data.intermediaryPose = intermediaryPose;
+            this.controller.data.spellIdAtPose = spellIdAtPose;
+            this.controller.data.castOnPose = castOnPose;
+            this.controller.data.waitForIntermediate = waitForIntermediate;
+            this.controller.data.cooldownBetweenCastTime = cooldownBetweenCastTime;
+            this.controller.data.cooldownBetweenSwapTime = cooldownBetweenSwapTime;
+            this.controller.data.cooldownIntermediary = cooldownIntermidiary;
+            this.controller.Serialize(this.controller.data);
         }
 
         void UpdateData()

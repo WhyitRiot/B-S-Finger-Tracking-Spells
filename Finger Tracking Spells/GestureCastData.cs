@@ -8,12 +8,13 @@ namespace GestureCasting
 {
     public class GestureCastData
     {
-        public bool levelLoaded = false;
-        public bool menuLoaded = false;
-        public bool castOnPose;
+        public float[][] handPoses;
+        public string[] spellIdAtPose;
         public bool waitForIntermediate;
-        public float cooldownIntermediary;
+        public float[] intermediaryPose;
+        public bool castOnPose;
         public float cooldownBetweenCastTime;
         public float cooldownBetweenSwapTime;
+        public float cooldownIntermediary;
     }
 }
