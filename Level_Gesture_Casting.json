@@ -1,0 +1,16 @@
+{
+  "$type": "ThunderRoad.LevelData, ThunderRoad",
+  "id": "Master",
+  "version": 3,
+  "modes": [
+    {
+      "name": "Default",
+      "modules": 
+	    [
+        {
+          "$type": "GestureCasting.Load, Gesture Casting"
+        }
+      ]
+    }
+  ]
+}

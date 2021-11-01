@@ -1,0 +1,42 @@
+{
+  "handPoses": [
+    [
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "spellIdAtPose": [
+    "Fire",
+    "Lightning",
+    "Gravity"
+  ],
+  "waitForIntermediate": true,
+  "intermediaryPose": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "castOnPose": true,
+  "cooldownBetweenCastTime": 0.75,
+  "cooldownBetweenSwapTime": 0.75,
+  "cooldownIntermediary": 0.5
+}
