@@ -2,7 +2,7 @@
 using ThunderRoad;
 using UnityEngine;
 
-namespace Finger_Tracking_Spells
+namespace GestureCasting
 {
     class PosingHand
     {

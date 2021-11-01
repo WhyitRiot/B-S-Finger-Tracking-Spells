@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ThunderRoad;
 
-namespace Finger_Tracking_Spells
+namespace GestureCasting
 {
     public class Load : LevelModule
     {
@@ -17,13 +17,16 @@ namespace Finger_Tracking_Spells
         public float cooldownIntermidiary;
         public bool castOnPose;
         private float intermTime = Time.time;
+        GestureCastController controller;
         PosingHand[] hands = new PosingHand[] { new PosingHand(Side.Left), new PosingHand(Side.Right) };
         List<WheelMenu.Orb> list;
+        Creature creature;
+        private bool loaded = false;
 
-        public override IEnumerator OnLoadCoroutine(Level level)
+        public override IEnumerator OnLoadCoroutine()
         {
             EventManager.onCreatureSpawn += EventManager_onCreatureSpawn;
-            return base.OnLoadCoroutine(level);
+            yield break;
         }
 
         private void EventManager_onCreatureSpawn(Creature creature)
@@ -40,59 +43,93 @@ namespace Finger_Tracking_Spells
                         Debug.Log(i);
                     }
                     Debug.Log("Hand Poses loaded: " + handPoses.Length);
-                    Debug.Log(cooldownBetweenSwapTime);
-                    Debug.Log(cooldownBetweenCastTime);
+                    Debug.Log("Swap Cooldown: " + cooldownBetweenSwapTime);
+                    Debug.Log("Cast Cooldown: " + cooldownBetweenCastTime);
+                    Debug.Log("Intermediary Cooldown: " + cooldownIntermidiary);
                 }
                 catch (Exception e)
                 {
                     Debug.Log(e);
                 }
+                this.creature = Player.currentCreature;
+                loaded = true;
             }
         }
 
-        public override void Update(Level level)
+        public override void Update()
         {
-            base.Update(level);
-            Creature creature = Player.currentCreature;
-            foreach (PosingHand hand in hands)
+            if (loaded)
             {
-                hand.UpdateFingers();
-                if (hand.orb != null && Time.time - hand.timeOfSwap >= cooldownBetweenSwapTime)
+                if (controller != null)
                 {
-                    hand.DespawnOrb(hand.orb);
+                    this.controller = GameManager.local.gameObject.GetComponent<GestureCastController>();
+                    OnMenuLoaded(controller);
                 }
-                if (waitForIntermediate)
+                else if (controller.data.menuLoaded)
                 {
-                    if (Time.time - intermTime >= cooldownIntermidiary)
+                    UpdateData();
+                }
+
+                foreach (PosingHand hand in hands)
+                {
+                    hand.UpdateFingers();
+                    if (hand.orb != null && Time.time - hand.timeOfSwap >= cooldownBetweenSwapTime)
                     {
-                        if (!creature.mana.GetCaster(hand.side).isFiring)
+                        hand.DespawnOrb(hand.orb);
+                    }
+                    if (waitForIntermediate)
+                    {
+                        if (Time.time - intermTime >= cooldownIntermidiary)
                         {
-                            hand.intermediateTriggered = false;
+                            if (!creature.mana.GetCaster(hand.side).isFiring)
+                            {
+                                hand.intermediateTriggered = false;
+                            }
+                        }
+                        if (hand.CheckForPose(intermediaryPose))
+                        {
+                            if (!hand.intermFirstPose)
+                            {
+                                intermTime = Time.time;
+                                hand.intermediateTriggered = true;
+                                hand.intermFirstPose = true;
+                            }
+                        }
+                        if (Time.time - hand.timeOfSwap >= cooldownBetweenSwapTime && !hand.CheckForPose(intermediaryPose))
+                        {
+                            hand.intermFirstPose = false;
+                        }
+                        if (hand.intermediateTriggered)
+                        {
+                            PoseCast(hand, creature);
                         }
                     }
-                    if (hand.CheckForPose(intermediaryPose))
-                    {
-                        if (!hand.intermFirstPose)
-                        {
-                            intermTime = Time.time;
-                            hand.intermediateTriggered = true;
-                            hand.intermFirstPose = true;
-                        }
-                    }
-                    if (Time.time - hand.timeOfSwap >= cooldownBetweenSwapTime && !hand.CheckForPose(intermediaryPose))
-                    {
-                        hand.intermFirstPose = false;
-                    }
-                    if (hand.intermediateTriggered)
+                    else
                     {
                         PoseCast(hand, creature);
                     }
                 }
-                else
-                {
-                    PoseCast(hand, creature);
-                }
             }
+        }
+
+        public void OnMenuLoaded(GestureCastController controller)
+        {
+            this.controller = controller;
+            this.controller.data.castOnPose = this.castOnPose;
+            this.controller.data.waitForIntermediate = this.waitForIntermediate;
+            this.controller.data.cooldownBetweenSwapTime = this.cooldownBetweenSwapTime;
+            this.controller.data.cooldownBetweenCastTime = this.cooldownBetweenCastTime;
+            this.controller.data.cooldownIntermediary = this.cooldownIntermidiary;
+            this.controller.data.levelLoaded = true;
+        }
+
+        void UpdateData()
+        {
+            this.castOnPose = controller.data.castOnPose;
+            this.waitForIntermediate = controller.data.waitForIntermediate;
+            this.cooldownBetweenSwapTime = controller.data.cooldownBetweenSwapTime;
+            this.cooldownBetweenCastTime = controller.data.cooldownBetweenCastTime;
+            this.cooldownIntermidiary = controller.data.cooldownIntermediary;
         }
 
         void PoseCast(PosingHand hand, Creature creature)
@@ -129,7 +166,6 @@ namespace Finger_Tracking_Spells
                 {
                     if (hand.currentSpell.hashId == GetSpell(spellIdAtPose[i]).hashId)
                     {
-                        Debug.Log("Should stop casting");
                         creature.mana.GetCaster(hand.side).Fire(false);
                         creature.mana.GetCaster(hand.side).FireAxis(0f);
                         hand.isCasting = false;
@@ -147,9 +183,9 @@ namespace Finger_Tracking_Spells
                 {
                     return;
                 }
-                caster.LoadSpell((SpellCastData)spell);
-                hand.currentSpell = (SpellCastData)spell;
                 this.list = PopulateSpellMenu();
+                caster.LoadSpell((SpellCastData)spell, new SpellData.Level(GetSpellOrb(list, GetSpellIconEffect(spell.id)).linkedObject as ContainerData.Content));
+                hand.currentSpell = (SpellCastData)spell;
                 hand.SpawnOrb(GetSpellOrb(list, GetSpellIconEffect(spell.id)), Player.currentCreature.GetHand(side));
                 PlayerControl.GetHand(side).HapticShort(1f);
             }
