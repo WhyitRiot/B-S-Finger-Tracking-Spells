@@ -26,7 +26,7 @@ namespace GestureCasting
         public override IEnumerator OnLoadCoroutine()
         {
             EventManager.onCreatureSpawn += EventManager_onCreatureSpawn;
-            //EventManager.onLevelLoad += OnLevelLoaded;
+            EventManager.onLevelLoad += OnLevelLoaded;
             yield break;
         }
 
