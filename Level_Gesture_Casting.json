@@ -1,16 +1,23 @@
 {
-  "$type": "ThunderRoad.LevelData, Assembly-CSharp",
+  "$type": "ThunderRoad.LevelData, ThunderRoad",
   "id": "Master",
-  "version": 2,
+  "version": 3,
   "modes": [
     {
       "name": "Default",
       "modules": 
 	  [
       {
-        "$type": "Finger_Tracking_Spells.Load, Finger Tracking Spells",
+        "$type": "GestureCasting.Load, Gesture Casting",
         "handPoses": [
           [
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          [
             1.0,
             1.0,
             0.0,
@@ -20,20 +27,6 @@
           [
             0.0,
             1.0,
-            1.0,
-            1.0,
-            0.0
-          ],
-          [
-            0.0,
-            0.0,
-            1.0,
-            1.0,
-            0.0
-          ],
-          [
-            1.0,
-            0.0,
             1.0,
             1.0,
             1.0
@@ -42,10 +35,20 @@
         "spellIdAtPose": [
           "Fire",
           "Lightning",
-          "Gravity",
-          "Reaper"
+          "Gravity"
         ],
-        "cooldownTime": 1.0
+        "waitForIntermediate": true,
+        "intermediaryPose": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "cooldownBetweenSwapTime": 0.75,
+        "cooldownBetweenCastTime": 0.75,
+        "cooldownIntermidiary": 0.5,
+        "castOnPose": true
       }
       ]
     }

@@ -1,0 +1,13 @@
+{
+  "$type": "ThunderRoad.MenuData, ThunderRoad",
+  "id": "Gesture Casting",
+  "saveFolder": "bas",
+  "version": 1,
+  "order": 4.0,
+  "isDefault": false,
+  "iconAddress": "Bas.Icon.beach-bucket",
+  "prefabAddress": "GestureCastMenu",
+  "module": {
+    "$type": "GestureCasting.GestureCastMenu, Gesture Casting"
+  }
+}
