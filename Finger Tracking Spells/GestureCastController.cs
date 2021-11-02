@@ -7,7 +7,7 @@ namespace GestureCasting
 {
     public class GestureCastController : MonoBehaviour
     {
-        private string fileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Settings.json");
+        private string fileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Settings/Settings.json");
         public GestureCastData data = new GestureCastData();
         public void Serialize(GestureCastData data)
         {
