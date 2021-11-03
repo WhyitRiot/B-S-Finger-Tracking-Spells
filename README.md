@@ -4,7 +4,7 @@ B&S Spell Selection with Finger Tracking
 With this mod I intend to make use of Blade and Sorcery's finger tracking.
 (That being said, this works best with the Index)
 
-Poses are stored in the Level_Finger_Tracking_Spells.JSON, inside the handPoses array.
+Poses are stored in the Settings.JSON, inside the handPoses array.
 
 In order to bind a specific spell to a pose, you will need to get the desired spell's spellID.
 Take the spellID and enter it into the JSON under the spellAtPose array AT THE CORRESPONDING INDEX.
