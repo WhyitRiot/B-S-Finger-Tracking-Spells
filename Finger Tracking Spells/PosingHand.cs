@@ -56,6 +56,23 @@ namespace GestureCasting
             return true;
         }
 
+        public float[] recordPose()
+        {
+            float[] newPose = new float[5];
+            for (int i = 0; i < newPose.Length; i++)
+            {
+                if (this.hand[i] < 0.8f)
+                {
+                    newPose[i] = 0f;
+                }
+                else
+                {
+                    newPose[i] = 1f;
+                }
+            }
+            return newPose;
+        }
+
         public void SpawnOrb(WheelMenu.Orb orb, RagdollHand hand)
         {
             if (orb == null)

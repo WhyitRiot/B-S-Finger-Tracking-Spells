@@ -136,13 +136,16 @@ namespace GestureCasting
             this.cooldownBetweenSwapTime = controller.data.cooldownBetweenSwapTime;
             this.cooldownBetweenCastTime = controller.data.cooldownBetweenCastTime;
             this.cooldownIntermidiary = controller.data.cooldownIntermediary;
+            this.handPoses = controller.data.handPoses;
+            this.spellIdAtPose = controller.data.spellIdAtPose;
+            this.intermediaryPose = controller.data.intermediaryPose;
         }
 
         void PoseCast(PosingHand hand, Creature creature)
         {
             for (int i = 0; i < handPoses.Length; i++)
             {
-                if (hand.CheckForPose(handPoses[i]))
+                if (hand.CheckForPose(handPoses[i]) && spellIdAtPose[i] != null)
                 {
                     if (!creature.mana.GetCaster(hand.side).isFiring && Time.time - hand.timeOfCast >= cooldownBetweenCastTime)
                     {
