@@ -84,7 +84,7 @@ namespace GestureCasting
             orb.transform.SetParent(hand.transform, false);
             orb.transform.localPosition += new Vector3(-0.1f, 0.0f, 0.06f);
             orb.transform.localEulerAngles = new Vector3(180f, orb.transform.localEulerAngles.y, 90f);
-            orb.effectInstance = orb.effectData.Spawn(orb.transform, true, Array.Empty<Type>());
+            orb.effectInstance = orb.effectData.Spawn(orb.transform, true, null, false, Array.Empty<Type>());
             orb.effectInstance.Play(0);
             orb.effectInstance.SetIntensity(0f);
             orb.effectInstance.SetLayer(5);

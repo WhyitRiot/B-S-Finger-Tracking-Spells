@@ -215,7 +215,7 @@ namespace GestureCasting
             foreach (ContainerData.Content content in Player.currentCreature.container.contents)
             {
                 ItemModuleSpell module = content.itemData.GetModule<ItemModuleSpell>();
-                if (module != null && module.spellData is SpellCastData && content.itemData.categoryPath.Length == 0)
+                if (module != null && module.spellData is SpellCastData && content.itemData.category == null || content.itemData.category.Length == 0)
                 {
                     if (module.spellId == spellID)
                     {
@@ -247,7 +247,7 @@ namespace GestureCasting
             foreach (ContainerData.Content content in Player.currentCreature.container.contents)
             {
                 ItemModuleSpell module = content.itemData.GetModule<ItemModuleSpell>();
-                if (module != null && module.spellData is SpellCastData && content.itemData.categoryPath.Length == 0)
+                if (module != null && module.spellData is SpellCastData && content.itemData.category == null || content.itemData.category.Length == 0)
                 {
                     list.Add(new WheelMenu.Orb(content.itemData.iconEffectData, content, null));
                 }
